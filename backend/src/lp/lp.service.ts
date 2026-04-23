@@ -406,6 +406,17 @@ export class LpService {
       });
     }
 
+    const sectionRegex =
+      /(?:^|\n)\s*(profit|revenue|gain|return|cost|objective)\s*:\s*([\s\S]*?)(?=\n\s*(?:constraints?|subject\s*to|sous\s+les\s+contraintes|formulate|provide|solve)\b|$)/i;
+    const sectionMatch = problemText.match(sectionRegex);
+
+    if (sectionMatch?.[2]) {
+      const sectionAssignments = this.extractVariableAssignments(sectionMatch[2]);
+      Object.entries(sectionAssignments).forEach(([label, value]) => {
+        byLabel.set(this.normalizeLabel(label), { label, value });
+      });
+    }
+
     byLabel.forEach((entry) => entries.push(entry));
     return entries;
   }
@@ -838,6 +849,7 @@ export class LpService {
       }
 
       const [, rawCoefficient, variable] = match;
+      const normalizedVariable = variable.toLowerCase();
       let coefficient = 1;
 
       if (rawCoefficient === undefined || rawCoefficient === "-" || rawCoefficient === "") {
@@ -852,7 +864,7 @@ export class LpService {
         coefficient = parsed;
       }
 
-      coefficients[variable] = (coefficients[variable] || 0) + coefficient;
+      coefficients[normalizedVariable] = (coefficients[normalizedVariable] || 0) + coefficient;
     }
 
     if (!Object.keys(coefficients).length) {
