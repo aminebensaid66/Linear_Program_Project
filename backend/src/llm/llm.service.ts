@@ -128,7 +128,9 @@ export class LlmService {
           content:
             "You are an Operations Research parser. Convert linear programming text into strict JSON only. " +
             "No markdown, no comments. Output exactly one JSON object with keys: title, objective, constraints, variables, variable_bounds. " +
-            "objective.sense must be minimize or maximize. constraints.operator must be <=, >=, or =."
+            "objective.sense must be minimize or maximize. constraints.operator must be <=, >=, or =. " +
+            "If user gives a narrative formulation request (not explicit equations), infer objective from business context " +
+            "(profit/revenue => maximize, cost/time/penalty => minimize), define decision variables, and translate all numeric conditions to linear constraints."
         },
         {
           role: "user",
